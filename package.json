@@ -1,0 +1,29 @@
+{
+  "name": "schema-generator",
+  "version": "1.0.0",
+  "description": "generate random objects based on json schema",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jjyyxx/SchemaFaker.git"
+  },
+  "keywords": [
+    "json-schema"
+  ],
+  "author": "jjyyxx",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jjyyxx/SchemaFaker/issues"
+  },
+  "homepage": "https://github.com/jjyyxx/SchemaFaker#readme",
+  "dependencies": {
+    "json-schema-ref-parser": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/json-schema": "^6.0.1",
+    "@types/node": "^10.5.2"
+  }
+}

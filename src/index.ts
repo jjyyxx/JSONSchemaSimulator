@@ -1,6 +1,8 @@
 import RefParser from 'json-schema-ref-parser'
 import { JSONSchema6 } from 'json-schema'
 
+import { generate } from './generate'
+
 const refParser = new RefParser()
 
 export async function load(raw: object) {
@@ -12,13 +14,10 @@ export async function load(raw: object) {
   })()
 }
 
-function generate(schema: JSONSchema6): object {
-  return {}
-}
-
-// load({}).then((r) => {
-//   r.next()
-//   r.next()
-//   r.next()
-//   r.next()
-// })
+load({
+  type: 'integer'
+}).then((r) => {
+  for(let i = 10; i--;) {
+    console.log(r.next().value)
+  }
+})

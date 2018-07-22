@@ -8,3 +8,6 @@ export const MAX_NUMBER = 100
 
 export const MIN_LENGTH = 0
 export const MAX_LENGTH = 20
+
+export const MIN_ITEMS = 0
+export const MAX_ITEMS = 10

@@ -25,19 +25,49 @@ function shrink(schema: JSONSchema6): JSONSchema6WithType {
   return <JSONSchema6WithType>final
 }
 
-function subGenerate(sub: JSONSchema6, queue: JSONSchema6WithTarget[]) {
+function attach(sub: JSONSchema6, queue: JSONSchema6WithTarget[]) {
   const shrinked = <JSONSchema6WithTarget>shrink(sub)
   switch (shrinked.type) {
     case 'array':
-      shrinked.target = []
+      // shrinked.target = []
       queue.push(shrinked)
-      return shrinked.target
+      return shrinked.target = []
     case 'object':
-      shrinked.target = {}
+      // shrinked.target = {}
       queue.push(shrinked)
-      return shrinked.target
+      return shrinked.target = {}
     default:
       return shrinked.target = TypeGenerators[<JSONSchema6TypeName>shrinked.type](shrinked, queue)
+  }
+}
+
+export function generate(rootSchema: JSONSchema6): any {
+  if (rootSchema.const !== undefined) {
+    return rootSchema.const
+  } else if (rootSchema.enum !== undefined) {
+    return getRandomElement(rootSchema.enum)
+  } else {
+    const queue: JSONSchema6WithTarget[] = []
+    const result = attach(rootSchema, queue)
+    let schema
+    if (schema = queue.shift()) {
+      TypeGenerators[<JSONSchema6TypeName>schema.type](schema, queue)
+      while (schema = queue.shift()) {
+        singleGenerate(schema, queue)
+      }
+    }
+    return result
+  }
+}
+
+export function singleGenerate(schema: JSONSchema6, queue: JSONSchema6WithTarget[]) {
+  if (schema.const !== undefined) {
+    return schema.const
+  } else if (schema.enum !== undefined) {
+    return getRandomElement(schema.enum)
+  } else {
+    const shrinked = shrink(schema)
+    return TypeGenerators[<JSONSchema6TypeName>shrinked.type](shrinked, queue)
   }
 }
 
@@ -48,10 +78,10 @@ const TypeGenerators: {
     return null // not implemented
   },
   array(schema: JSONSchema6, queue: JSONSchema6WithTarget[]) {
-    const target = (<JSONSchema6WithTarget>schema).target
+    const target = <any[]>((<JSONSchema6WithTarget>schema).target)
     if (schema.items && Array.isArray(schema.items)) {
-      (<any[]>target).push(...schema.items.map((sub) => {
-        return subGenerate(sub, queue)
+      target.push(...schema.items.map((sub) => {
+        return attach(sub, queue)
       }))
     } else {
       const minItems = schema.minItems === undefined ? MIN_ITEMS : schema.minItems
@@ -60,11 +90,11 @@ const TypeGenerators: {
       if (schema.items) {
         const sub = <JSONSchema6>schema.items
         while (num--) {
-          (<any[]>target).push(subGenerate(sub, queue))
+          target.push(attach(sub, queue))
         }
       } else {
         while (num--) {
-          (<any[]>target).push(null)        
+          target.push(null)        
         }
       }
     }
@@ -107,7 +137,7 @@ const TypeGenerators: {
       if (key in schema.properties) {
         const sub = schema.properties[key]
         if (typeof sub === 'object') {
-          (<any>target)[key] = subGenerate(sub, queue)
+          (<any>target)[key] = attach(sub, queue)
         } else if (sub) {
           (<any>target)[key] = null
         }
@@ -124,25 +154,5 @@ const TypeGenerators: {
       text += possible.charAt(Math.floor(Math.random() * possible.length))
     }
     return text
-  }
-}
-
-export function generate(rootSchema: JSONSchema6): any {
-  const queue: JSONSchema6WithTarget[] = [<JSONSchema6WithTarget>rootSchema]
-  let schema
-  while (schema = queue.shift()) {
-    singleGenerate(schema, queue)
-  }
-  return (<JSONSchema6WithTarget>rootSchema).target
-}
-
-export function singleGenerate(schema: JSONSchema6, queue: JSONSchema6WithTarget[]) {
-  if (schema.const !== undefined) {
-    return schema.const
-  } else if (schema.enum !== undefined) {
-    return getRandomElement(schema.enum)
-  } else {
-    schema = shrink(schema)
-    return TypeGenerators[<JSONSchema6TypeName>schema.type](schema, queue)
   }
 }

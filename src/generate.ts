@@ -14,6 +14,7 @@ function shrink(schema: JSONSchema6): JSONSchema6WithType {
       delete temp.anyOf
       Object.assign(final, temp)
       temp = getRandomElement(anyOf)
+      Object.assign(final, temp)
     }
     // if (temp.allOf !== undefined) {}
     // if (temp.oneOf !== undefined) {}
@@ -26,6 +27,12 @@ function shrink(schema: JSONSchema6): JSONSchema6WithType {
 }
 
 function attach(sub: JSONSchema6, queue: JSONSchema6WithTarget[]) {
+  if (sub.const !== undefined) {
+    return sub.const
+  }
+  if (sub.enum !== undefined) {
+    return getRandomElement(sub.enum)
+  }
   const shrinked = <JSONSchema6WithTarget>shrink(sub)
   switch (shrinked.type) {
     case 'array':
@@ -53,21 +60,12 @@ export function generate(rootSchema: JSONSchema6): any {
     if (schema = queue.shift()) {
       TypeGenerators[<JSONSchema6TypeName>schema.type](schema, queue)
       while (schema = queue.shift()) {
-        singleGenerate(schema, queue)
+        const shrinked = shrink(schema)
+        TypeGenerators[<JSONSchema6TypeName>shrinked.type](shrinked, queue)
+        if (queue.length > 10000) return result
       }
     }
     return result
-  }
-}
-
-export function singleGenerate(schema: JSONSchema6, queue: JSONSchema6WithTarget[]) {
-  if (schema.const !== undefined) {
-    return schema.const
-  } else if (schema.enum !== undefined) {
-    return getRandomElement(schema.enum)
-  } else {
-    const shrinked = shrink(schema)
-    return TypeGenerators[<JSONSchema6TypeName>shrinked.type](shrinked, queue)
   }
 }
 

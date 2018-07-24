@@ -10,4 +10,13 @@ export const MIN_LENGTH = 0
 export const MAX_LENGTH = 20
 
 export const MIN_ITEMS = 0
-export const MAX_ITEMS = 4
+export const MAX_ITEMS = 20
+
+export const MAX_LEVELS = 4
+
+export const ENV = {
+  level: 0,
+  get constrainedItems() : number {
+    return Math.floor(MAX_ITEMS / (1 + this.level))
+  }
+}

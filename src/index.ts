@@ -3,10 +3,14 @@ import { JSONSchema6 } from 'json-schema'
 
 import { generate } from './generate'
 
-export async function load(raw: JSONSchema6) {
+export async function load(raw: JSONSchema6, {
+  generationLimit = -1
+} = {}) {
   const schema = await new RefParser().dereference(raw)
+  let generations = 0
   return (function* () {
-    while (true) {
+    while (generationLimit !== generations) {
+      ++generations
       yield generate(<JSONSchema6>schema)
     }
   })()

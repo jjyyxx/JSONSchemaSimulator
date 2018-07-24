@@ -1,5 +1,5 @@
 import { JSONSchema6, JSONSchema6TypeName } from 'json-schema'
-import { MAX_INTEGER, MIN_INTEGER, MIN_NUMBER, MAX_NUMBER, MIN_LENGTH, MAX_LENGTH, MIN_ITEMS, MAX_ITEMS } from './config'
+import { MAX_INTEGER, MIN_INTEGER, MIN_NUMBER, MAX_NUMBER, MIN_LENGTH, MAX_LENGTH, MIN_ITEMS, MAX_ITEMS, MAX_LEVELS, ENV } from './config'
 import { getRandom, getRandomInt, getRandomElement } from './util'
 import { infer } from './infer'
 
@@ -58,11 +58,21 @@ export function generate(rootSchema: JSONSchema6): any {
     const result = attach(rootSchema, queue)
     let schema
     if (schema = queue.shift()) {
+      ENV.level = 0
       TypeGenerators[<JSONSchema6TypeName>schema.type](schema, queue)
+      let levelNum = queue.length
       while (schema = queue.shift()) {
         const shrinked = shrink(schema)
         TypeGenerators[<JSONSchema6TypeName>shrinked.type](shrinked, queue)
-        if (queue.length > 10000) return result
+
+        --levelNum
+        if (levelNum === 0) {
+          ++ENV.level
+          // if (level > MAX_LEVELS) break
+          levelNum = queue.length
+          // TODO: further add possibility constraint based on level
+        }
+
       }
     }
     return result
@@ -83,7 +93,7 @@ const TypeGenerators: {
       }))
     } else {
       const minItems = schema.minItems === undefined ? MIN_ITEMS : schema.minItems
-      const maxItems = schema.maxItems === undefined ? MAX_ITEMS : schema.maxItems
+      const maxItems = schema.maxItems === undefined ? /* MAX_ITEMS */ ENV.constrainedItems : schema.maxItems
       let num = getRandomInt(minItems, maxItems)
       if (schema.items) {
         const sub = <JSONSchema6>schema.items

@@ -1,29 +1,43 @@
 {
   "name": "schema-generator",
   "version": "1.0.0",
-  "description": "generate random objects based on json schema",
+  "description": "Generate random objects based on json schema",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jjyyxx/SchemaFaker.git"
+    "url": "git+https://github.com/jjyyxx/SchemaGenerator.git"
   },
   "keywords": [
     "json-schema"
   ],
   "author": "jjyyxx",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jjyyxx/SchemaFaker/issues"
+    "url": "https://github.com/jjyyxx/SchemaGenerator/issues"
   },
-  "homepage": "https://github.com/jjyyxx/SchemaFaker#readme",
+  "homepage": "https://github.com/jjyyxx/SchemaGenerator#readme",
   "dependencies": {
     "json-schema-ref-parser": "^5.1.0"
   },
   "devDependencies": {
+    "@types/jest": "^23.3.0",
     "@types/json-schema": "^6.0.1",
-    "@types/node": "^10.5.2"
+    "@types/node": "^10.5.2",
+    "jest": "^23.4.1",
+    "ts-jest": "^23.0.1"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
+    "testRegex": "(/test/.*?\\.test)\\.ts$",
+    "moduleFileExtensions": [
+      "ts",
+      "js",
+      "json"
+    ]
   }
 }

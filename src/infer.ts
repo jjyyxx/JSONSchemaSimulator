@@ -1,5 +1,7 @@
 import { JSONSchema6 } from 'json-schema'
-type InferableTypes = 'array' | 'integer' | 'object' | 'string' | 'number'
+import { INTEGER_NUMBER_INFER_PREFERENCE } from './config'
+
+type InferableTypes = 'array' | 'object' | 'string' | typeof INTEGER_NUMBER_INFER_PREFERENCE
 const inferableProperties: {
   [key in InferableTypes]: string[]
 } = {
@@ -10,14 +12,7 @@ const inferableProperties: {
     'minItems',
     'uniqueItems'
   ],
-  integer: [
-    'exclusiveMaximum',
-    'exclusiveMinimum',
-    'maximum',
-    'minimum',
-    'multipleOf'
-  ],
-  number: [
+  [INTEGER_NUMBER_INFER_PREFERENCE]: [
     'exclusiveMaximum',
     'exclusiveMinimum',
     'maximum',
@@ -40,20 +35,12 @@ const inferableProperties: {
   ]
 }
 
-const inferableTypes = <Array<InferableTypes>>Object.keys(inferableProperties)
-
-const subschemaProperties: string[] = [
-  'additionalItems',
-  'items',
-  'additionalProperties',
-  'dependencies',
-  'patternProperties',
-  'properties'
-]
+const inferableTypes = <InferableTypes[]>Object.keys(inferableProperties)
 
 export function infer(schema: JSONSchema6): InferableTypes | 'any' {
+  const schemaKeys = Object.keys(schema)
   for (const typeName of inferableTypes) {
-    if (Object.keys(schema).some((prop) => inferableProperties[typeName].includes(prop))) {
+    if (schemaKeys.some((prop) => inferableProperties[typeName].includes(prop))) {
       return typeName
     }
   }

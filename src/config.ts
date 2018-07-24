@@ -14,6 +14,8 @@ export const MAX_ITEMS = 20
 
 export const MAX_LEVELS = 4
 
+export const INTEGER_NUMBER_INFER_PREFERENCE = 'integer' // or number
+
 export const ENV = {
   level: 0,
   get constrainedItems() : number {

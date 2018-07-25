@@ -9,12 +9,12 @@ script:
 - npm run build
 - npm run ci
 deploy:
-  skip_cleanup: true
-  provider: npm
-  email: obfishstudio@gmail.com
-  on:
-    tags: false
-    repo: jjyyxx/JSONSchemaSimulator
-    branch: develop
-  api_key:
-    secure: "Yqekh15UaE0f31yfOk5RPGKqT8sFsdqkAWIyDzMSwFwYq1uLe3KGX/M/rCKpvgqiK6Q15PY/7ZJitAxPmzaZpsOhp9RkvvMpFnMkOYyg1mPIwJvtfe/f75AS9FMo0EJ/4QqAISp+AbLR3TgOax+GY223mH3cz+0AAzWUbp1sQqGWX7pBZnd7IKEt3mLg684tbXwejs2yiEBsQ9SnYdbb4orPdO1dAlqwidMhqPh+ImNKsJGEa0exQlqvkMVENnhtq5nIK5gNsuO+eVVRDr4yu/HlTw04WnPuCaIx7S6ajSThv662cSPvyNibMXoQOfaUZ+zkVHLsPq8/UKowSGfRo9H5F87y1jV+dDUUWoY/oz8nkuJTvehJoj+l82svP4NFNueZiT6MLeX8GAEms4v4YyVFtKLBVIoJE0IYY5CIBXG3Jh+wiDfENipcfGpuwGG/04L6v+SF/cmV3AJK5DizdEIwexXonzuMQQf9abGA9h/Yre7cTytj8OdE9Hf1HVEGXvUnZqKdOURn3IMUE+68LBK4nz4n3nySJvHxev9V2U2ckaurUPeX4YDhjGPIeXeHFtVSeVcaXlC89MRkHQO+3fnLo8edEcAJeQpLuOry/dgQduuUAD27P/fjXs30//0zFkxpidpM4UoAzGGUMJRQlgrKBpCUoohagSR7mrZ4bYQ="
+  - skip_cleanup: true
+    provider: npm
+    email: obfishstudio@gmail.com
+    on:
+      tags: false
+      repo: jjyyxx/JSONSchemaSimulator
+      branch: develop
+    api_key:
+      secure: "Yqekh15UaE0f31yfOk5RPGKqT8sFsdqkAWIyDzMSwFwYq1uLe3KGX/M/rCKpvgqiK6Q15PY/7ZJitAxPmzaZpsOhp9RkvvMpFnMkOYyg1mPIwJvtfe/f75AS9FMo0EJ/4QqAISp+AbLR3TgOax+GY223mH3cz+0AAzWUbp1sQqGWX7pBZnd7IKEt3mLg684tbXwejs2yiEBsQ9SnYdbb4orPdO1dAlqwidMhqPh+ImNKsJGEa0exQlqvkMVENnhtq5nIK5gNsuO+eVVRDr4yu/HlTw04WnPuCaIx7S6ajSThv662cSPvyNibMXoQOfaUZ+zkVHLsPq8/UKowSGfRo9H5F87y1jV+dDUUWoY/oz8nkuJTvehJoj+l82svP4NFNueZiT6MLeX8GAEms4v4YyVFtKLBVIoJE0IYY5CIBXG3Jh+wiDfENipcfGpuwGG/04L6v+SF/cmV3AJK5DizdEIwexXonzuMQQf9abGA9h/Yre7cTytj8OdE9Hf1HVEGXvUnZqKdOURn3IMUE+68LBK4nz4n3nySJvHxev9V2U2ckaurUPeX4YDhjGPIeXeHFtVSeVcaXlC89MRkHQO+3fnLo8edEcAJeQpLuOry/dgQduuUAD27P/fjXs30//0zFkxpidpM4UoAzGGUMJRQlgrKBpCUoohagSR7mrZ4bYQ="

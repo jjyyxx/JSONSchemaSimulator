@@ -14,7 +14,5 @@ deploy:
   email: obfishstudio@gmail.com
   on:
     tags: false
-    repo: jjyyxx/SchemaGenerator
+    repo: jjyyxx/JSONSchemaSimulator
     branch: develop
-  api_key:
-    secure: v4N/uNwjMNI0hMsonNp9GyzOU1kbOE7CjzL983ohBnV/VRrlEFp6MavmlEotxDBS9EeA1Yk5AGq5j3Mx642M5z02ikjwMFdO3bFdJA2Urm9HoWhD04cqzf43/nYaQVK+bbiU0rRHWRqNlnGg+DiuNBxA5AQc7INia9/J3jiwKkJiWm2FOcV0ebw2OU0hVO6Kwemh+c/G3fpRurBBBXlhd4rbqDJCCZuSO7TL5G8sjMdh3ttnHgx9jstVTHBLobWeHfNmN7KqwcwKkr0SrGPjuT6ASrHjWT46Dj7ymfNM7fWAqtbehxZW/djD8gFYD3ZvsbTx3BmiqnPivLwVlH26ihgYpwxejW+7Hqw/NkSrBncRLX+7oOzBulU4b59tnb/i/+qIhw+S4Z2rkNeGv/ZVxARYvqPjtDQGAgtORZVkewiMbTBc5cV5HfO20j8fclO+qSKHPHvhVu+wZL656Pz0rZ/E8RlA/JbkyIiZFCmKQUIC2CE0ur3G7l0FQmmy3lLioVEgnrgTZcAd81e9Spx6jrPkY1aRdmWIdxoLdzAqfC/qL9skIi7v+2Qek2pGPiFFmUsEEXAIlAZfl+Sqx0F2J/HMcuQRhCcVwOPwA21SFFUR060kVr0viLWkb2GVhuFOcQvtpgeNpP8qjpjG6K7iWVoySR48AbZ8SBCm7qq7DiE=

@@ -4,9 +4,9 @@ import { getRandom, getRandomInt, getRandomElement } from './util'
 import { infer } from './infer'
 
 type JSONSchema6WithType = JSONSchema6 & { type: JSONSchema6TypeName }
-type JSONSchema6WithTarget = JSONSchema6WithType & { target: Array<any> | object }
+export type JSONSchema6WithTarget = JSONSchema6WithType & { target: Array<any> | object }
 
-function shrink(schema: JSONSchema6): JSONSchema6WithType {
+export function shrink(schema: JSONSchema6): JSONSchema6WithType {
   let final = Object.assign({}, schema), temp = final
   while (temp.anyOf/*  || temp.oneOf || temp.allOf || temp.not */) {
     if (temp.anyOf !== undefined) {
@@ -26,7 +26,7 @@ function shrink(schema: JSONSchema6): JSONSchema6WithType {
   return <JSONSchema6WithType>final
 }
 
-function attach(sub: JSONSchema6, queue: JSONSchema6WithTarget[]) {
+export function attach(sub: JSONSchema6, queue: JSONSchema6WithTarget[]) {
   if (sub.const !== undefined) {
     return sub.const
   }
@@ -79,11 +79,13 @@ export function generate(rootSchema: JSONSchema6): any {
   }
 }
 
-const TypeGenerators: {
+export const ConcreteTypes: JSONSchema6TypeName[] = [/* 'array',  */'boolean', 'integer', 'null', 'number',/*  'object', */ 'string']
+
+export const TypeGenerators: {
   [key in JSONSchema6TypeName]: (schema: JSONSchema6, queue: JSONSchema6WithTarget[]) => any
 } = {
-  any() {
-    return null // not implemented
+  any(schema: JSONSchema6, queue: JSONSchema6WithTarget[]) {
+    return this[getRandomElement(ConcreteTypes)](schema, queue)
   },
   array(schema: JSONSchema6, queue: JSONSchema6WithTarget[]) {
     const target = <any[]>((<JSONSchema6WithTarget>schema).target)
@@ -114,9 +116,6 @@ const TypeGenerators: {
   integer(schema: JSONSchema6) {
     const min = schema.minimum === undefined ? MIN_INTEGER : schema.minimum
     const max = schema.maximum === undefined ? MAX_INTEGER : schema.maximum
-
-    if (min > max) return NaN
-
     return getRandomInt(min, max)
   },
   null() {
@@ -125,32 +124,30 @@ const TypeGenerators: {
   number(schema: JSONSchema6) {
     const min = schema.minimum === undefined ? MIN_NUMBER : schema.minimum
     const max = schema.maximum === undefined ? MAX_NUMBER : schema.maximum
-
-    if (min > max) return NaN
-
     return getRandom(min, max)
   },
   object(schema: JSONSchema6, queue: JSONSchema6WithTarget[]) {
     const target = (<JSONSchema6WithTarget>schema).target
-    if (schema.required === undefined) {
-      return target
-    }
-    if (schema.properties === undefined) {
-      for (const key of schema.required) {
-        (<any>target)[key] = null
-      }
-      return target
-    }
-    for (const key of schema.required) {
-      if (key in schema.properties) {
-        const sub = schema.properties[key]
-        if (typeof sub === 'object') {
-          (<any>target)[key] = attach(sub, queue)
-        } else if (sub) {
-          (<any>target)[key] = null
+    if (schema.required !== undefined) {
+      if (schema.properties === undefined) {
+        // for (const key of schema.required) {
+        //   (<any>target)[key] = null
+        // }
+        return target
+      } else {
+        for (const key of schema.required) {
+          if (key in schema.properties) {
+            const sub = schema.properties[key]
+            if (typeof sub === 'object') {
+              (<any>target)[key] = attach(sub, queue)
+            }/*  else if (sub) {
+              (<any>target)[key] = null
+            } */
+          }
         }
       }
     }
+    return target
   },
   string(schema: JSONSchema6) {
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'

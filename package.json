@@ -20,12 +20,13 @@
   },
   "homepage": "https://github.com/jjyyxx/SchemaGenerator#readme",
   "dependencies": {
-    "json-schema-ref-parser": "^5.1.0"
+    "json-schema-ref-parser": "^5.1.1"
   },
   "devDependencies": {
     "@types/jest": "^23.3.0",
     "@types/json-schema": "^6.0.1",
     "@types/node": "^10.5.2",
+    "typescript": "^2.9.2",
     "jest": "^23.4.1",
     "ts-jest": "^23.0.1"
   },

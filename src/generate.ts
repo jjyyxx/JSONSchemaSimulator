@@ -128,21 +128,12 @@ export const TypeGenerators: {
   },
   object(schema: JSONSchema6, queue: JSONSchema6WithTarget[]) {
     const target = (<JSONSchema6WithTarget>schema).target
-    if (schema.required !== undefined) {
-      if (schema.properties === undefined) {
-        // for (const key of schema.required) {
-        //   (<any>target)[key] = null
-        // }
-        return target
-      } else {
-        for (const key of schema.required) {
-          if (key in schema.properties) {
-            const sub = schema.properties[key]
-            if (typeof sub === 'object') {
-              (<any>target)[key] = attach(sub, queue)
-            }/*  else if (sub) {
-              (<any>target)[key] = null
-            } */
+    if (schema.required !== undefined && schema.properties !== undefined) {
+      for (const key of schema.required) {
+        if (key in schema.properties) {
+          const sub = schema.properties[key]
+          if (typeof sub === 'object') {
+            (<any>target)[key] = attach(sub, queue)
           }
         }
       }

@@ -4,6 +4,7 @@
   "description": "Generate random objects based on json schema",
   "main": "dist/index.js",
   "scripts": {
+    "ci": "jest && codecov",
     "test": "jest"
   },
   "repository": {
@@ -26,9 +27,9 @@
     "@types/jest": "^23.3.0",
     "@types/json-schema": "^6.0.1",
     "@types/node": "^10.5.2",
-    "typescript": "^2.9.2",
     "jest": "^23.4.1",
-    "ts-jest": "^23.0.1"
+    "ts-jest": "^23.0.1",
+    "typescript": "^2.9.2"
   },
   "jest": {
     "transform": {
@@ -39,6 +40,8 @@
       "ts",
       "js",
       "json"
-    ]
+    ],
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": true
   }
 }

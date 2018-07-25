@@ -15,6 +15,5 @@ deploy:
     api_key:
       secure: "pvbgDltddC7Gh3rJN455lC28K+PQJSBnpEE72x971wWLIRnZXLmi3eoEA+cMhUd4NMT4lWQgp65NV5wNJQVtLWPdQ+3sq1NWY9k65SPa7YUjZebeIBAnQAr3kVUEoIHAnzL2dHVVnkUkKcTmqM7EPPV2fldgkMKPJBdaXesG1orRM+JmAmuLTMK80jI++zKyB8KXic/FDxWdmMbAEBlS3IqZryzG9LcN0PF1AKDgJQdwybB/bX0Jeq95j/lvj1JU/fMUsga7kjqB+GzsTTfScsXpFA5964EIPpGiqY9frgtTLdmTUlWx7axivNwbKvK67GZke12o9T0AWUkTkXNX5yC5dtTQ9cPSKRpTKdDdymJZg11KDoS3ypCa+THip0edSTmg25iwqXSYZ2fXcDU6/lno+1V/f5znJ21FNX3wVHr7HPmvBXys8GdwViwtuV+VEA9gdIet6L2WvYx2dC2W1NHFwb5wU5/93Am28Awwo+eDvmQ9Y0Vm/HNeNrxBF2JuY5HPT6Vl0omn3Z2AcfsB+gdVVVa197rrf8cmZvLbybTLbNwTbujSCN+fuU1mKR3Onm4n07/gMAJa7dJ8xD3/fp541cfQqIAlxs95AaNxn/ttxB5iZyl4DBFs/XH2p+UWwFsqjNwqVMfHWM7ioWGG3v5Ijrfq6J8rqXipxgYMJDI="
     on:
-      tags: true
       repo: jjyyxx/JSONSchemaSimulator
       branch: master

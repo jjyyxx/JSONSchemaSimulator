@@ -18,7 +18,7 @@ export const INTEGER_NUMBER_INFER_PREFERENCE = 'integer' // or number
 
 export const ENV = {
   level: 0,
-  get constrainedItems() : number {
+  get constrainedItems(): number {
     return Math.floor(MAX_ITEMS / (1 + this.level))
   }
 }

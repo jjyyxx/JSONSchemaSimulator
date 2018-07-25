@@ -1,3 +1,5 @@
 test
 .vscode
-.tarvis.yml
+.travis.yml
+tslint.json
+coverage

@@ -1,8 +1,11 @@
-import { TypeGenerators, JSONSchema6WithTarget } from '../src/generate'
-import { MAX_INTEGER, MIN_INTEGER, MIN_NUMBER, MAX_NUMBER, MIN_LENGTH, MAX_LENGTH, MIN_ITEMS, MAX_ITEMS, MAX_LEVELS, ENV } from '../src/config'
 import { JSONSchema6 } from 'json-schema'
+import {
+  MAX_INTEGER, MAX_ITEMS, MAX_LENGTH, MAX_NUMBER,
+  MIN_INTEGER, MIN_ITEMS, MIN_LENGTH, MIN_NUMBER
+} from '../src/config'
+import { generate, getConstOrEnum, JSONSchema6WithTarget, shrink, typeGenerate, TypeGenerators } from '../src/generate'
 
-describe('Generator core test', () => {
+describe('Generator types test', () => {
   it('should generate BOOLEAN correctly', () => {
     expect(typeof TypeGenerators.boolean({}, [])).toBe('boolean')
   })
@@ -137,24 +140,25 @@ describe('Generator core test', () => {
       const res2 = TypeGenerators.object(schema2, [])
       expect(res2).toEqual({})
       expect(schema2.target).toBe(res2)
-      
+
       const schema3: JSONSchema6WithTarget = {
         type: 'object',
-        required: ['exist1', 'exist2', 'notExist'],
+        required: ['exist1', 'exist2', 'notExist', 'false'],
         properties: {
-          'exist1': {
+          exist1: {
             type: 'integer',
             maximum: 5,
             minimum: 3
           },
-          'exist2': {
+          exist2: {
             type: 'boolean'
           },
-          'notRequired': {
+          notRequired: {
             type: 'string',
             maxLength: 5,
             minLength: 3
-          }
+          },
+          false: false
         },
         target: {}
       }
@@ -167,19 +171,212 @@ describe('Generator core test', () => {
       expect(typeof res3.exist2).toBe('boolean')
       expect(res3).not.toHaveProperty('notRequired')
       expect(res3).not.toHaveProperty('notExist')
+      expect(res3).not.toHaveProperty('false')
       expect(schema3.target).toBe(res3)
     }
   })
+})
 
-  it('should generate ANY correctly', () => {
-    for (let i = 0; i < 20; ++i) {
-      const schema: JSONSchema6WithTarget = {
-        type: 'any',
-        target: [] 
-      }
-      const res = TypeGenerators.any(schema, [])
-      expect(res).not.toBeUndefined()
-      expect(res).not.toBeInstanceOf(Object)
+describe('Generator shrink test', () => {
+  it('shrinks anyof to a subschema', () => {
+    const schema: JSONSchema6 = {
+      anyOf: [{
+        type: 'string'
+      }, {
+        type: 'boolean'
+      }]
     }
+    const shrinked = shrink(schema)
+    expect(shrinked).toHaveProperty('type')
+    expect(shrinked).not.toHaveProperty('anyOf')
+    expect(['string', 'boolean'].includes(shrinked.type)).toBe(true)
+  })
+
+  it('does not modify original schema', () => {
+    const schema: JSONSchema6 = {
+      anyOf: [{
+        type: 'string'
+      }, {
+        type: 'boolean'
+      }]
+    }
+    const shrinked = shrink(schema)
+    expect(schema).toEqual({
+      anyOf: [{
+        type: 'string'
+      }, {
+        type: 'boolean'
+      }]
+    })
+  })
+
+  it('resolves nested anyof', () => {
+    const schema: JSONSchema6 = {
+      anyOf: [{
+        anyOf: [{
+          type: 'boolean'
+        }]
+      }]
+    }
+    const shrinked = shrink(schema)
+    expect(shrinked).toEqual({
+      type: 'boolean'
+    })
+  })
+
+  it('deals with empty anyof correctly', () => {
+    const schema: JSONSchema6 = {
+      anyOf: []
+    }
+    const shrinked = shrink(schema)
+    expect(shrinked).toHaveProperty('type')
+    delete shrinked.type
+    expect(shrinked).toEqual({})
+  })
+
+  it('merges properties properly', () => {
+    const schema: JSONSchema6 = {
+      type: 'number',
+      anyOf: [{
+        maximum: 5,
+        minimum: 3,
+        anyOf: [{
+          minimum: 4
+        }]
+      }, {
+        maximum: 1,
+        minimum: -1,
+        type: 'integer'
+      }]
+    }
+    const shrinked = shrink(schema)
+    if (shrinked.type === 'number') {
+      expect(shrinked).toEqual({
+        type: 'number',
+        maximum: 5,
+        minimum: 4
+      })
+    } else {
+      expect(shrinked).toEqual({
+        type: 'integer',
+        maximum: 1,
+        minimum: -1
+      })
+    }
+  })
+})
+
+describe('Generator getConstOrEnum test', () => {
+  it('handles const correctly', () => {
+    const constObj = { foo: 'bar' }
+    const schema: JSONSchema6 = {
+      const: constObj
+    }
+    expect(getConstOrEnum(schema)).toBe(constObj)
+  })
+
+  it('handles enum correctly', () => {
+    const enumArray = [{ foo: 'bar' }, { bar: 'baz' }]
+    const schema: JSONSchema6 = {
+      enum: enumArray
+    }
+    expect(enumArray.includes(<any>getConstOrEnum(schema))).toBe(true)
+  })
+
+  it('returns undifined when neither const nor enum exist', () => {
+    const schema: JSONSchema6 = {
+      type: 'boolean'
+    }
+    expect(getConstOrEnum(schema)).toBeUndefined()
+  })
+})
+
+describe('Generator typeGenerate test', () => {
+  it('handles promitive types correctly', () => {
+    const schemas: JSONSchema6[] = [{
+      type: 'boolean'
+    }, {
+      type: 'integer'
+    }, {
+      type: 'null'
+    }, {
+      type: 'number'
+    }, {
+      type: 'string'
+    }]
+    const resultTypes = ['boolean', 'number', 'object', 'number', 'string']
+    for (let i = 0; i < 5; ++i) {
+      const schema = schemas[i]
+      const resultType = resultTypes[i]
+      const result = typeGenerate(schema, [])
+      expect(typeof result).toBe(resultType)
+    }
+  })
+
+  it('deals with array correctly', () => {
+    const schema: JSONSchema6 = {
+      type: 'array'
+    }
+    const queue: JSONSchema6WithTarget[] = []
+    const result = typeGenerate(schema, queue)
+    expect(result).toEqual([])
+    expect(queue).toHaveLength(1)
+    expect(queue[0].target).toBe(result)
+  })
+
+  it('deals with object correctly', () => {
+    const schema: JSONSchema6 = {
+      type: 'object'
+    }
+    const queue: JSONSchema6WithTarget[] = []
+    const result = typeGenerate(schema, queue)
+    expect(result).toEqual({})
+    expect(queue).toHaveLength(1)
+    expect(queue[0].target).toBe(result)
+  })
+})
+
+describe('Generator core test', () => {
+  it('deals with nested array/object correctly', () => {
+    const schema: JSONSchema6 = {
+      items: {
+        properties: {
+          foo: {
+            maxLength: 5,
+            minLength: 3
+          }
+        },
+        required: ['foo']
+      },
+      minItems: 4,
+      maxItems: 4
+    }
+    const result = generate(schema)
+    expect(result).toHaveLength(4)
+    for (const obj of result) {
+      expect(Object.keys(obj)).toEqual(['foo'])
+      expect(obj.foo).toMatch(/[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789]{3,5}/)
+    }
+  })
+
+  it('deals with top level const/enum/primitive correctly', () => {
+    const schema1: JSONSchema6 = {
+      const: 1
+    }
+    const result1 = generate(schema1)
+    expect(result1).toBe(1)
+
+    const schema2: JSONSchema6 = {
+      enum: ['foo']
+    }
+    const result2 = generate(schema2)
+    expect(result2).toBe('foo')
+
+    const schema3: JSONSchema6 = {
+      maximum: 4,
+      minimum: 4
+    }
+    const result3 = generate(schema3)
+    expect(result3).toBe(4)
   })
 })

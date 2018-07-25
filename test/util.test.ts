@@ -1,4 +1,4 @@
-import { getRandom, getRandomInt, getRandomElement } from '../src/util'
+import { getRandom, getRandomElement, getRandomInt } from '../src/util'
 
 describe('Basic random utility', () => {
   it('should get random number in an inclusive range', () => {

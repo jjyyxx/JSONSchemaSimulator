@@ -12,9 +12,9 @@ deploy:
   - skip_cleanup: true
     provider: npm
     email: obfishstudio@gmail.com
+    api_key:
+      secure: "ufc1xGPxnhRfGyKH5AgvDx26O7DKx56UVQPVDp75kJr2BU/QNgs/NzYLj6iE1rW+V7yzEYS7o579+4u41Y0e2ytQNGxfsZSNBNqhB4kC6TVQA2PpyT6Tvz6pYYxZLSTnpveHbFkVzMZc4dlHKjtpjOU13YLZ+YazHvWVS1Jlf+baMq7BmEXruvH17MQc/baP4N8njqRL2UjI0kT3aZWg119lBgcUePcfPNahB471aQlX7875Q+yQOAiOtLvHt9nMDEjynHRAp9hUB5v23DCSLRhIaphR0tc3SuHhtJ7qP//GAY1wtZbSvovPHI22VBHNYyxTsKraaBv7eV0AuBDM4Wh+ig98xVe7ezXLw4yXAywdqMd0Q3av1pctiSbgJFuzK3rs/JTtU9H3vSYN1DGNN/BO8LAeV7lrIb0u36Wh7YlR7vCFoe8EBOs2tGPvwkMcxOLNO4qKnhL96mo2Z4Dr/6lUr82Nj74WrvAdOgyd3GjxxE6/h+Tz8xzYFwnrHI4WRDwAJUMKIHQEznceQBtjwUaFVCIv7FEf7T/uEt/5DXRlfJ8mLa1/xwFiQNdL4Li9GqmomnSl+kC+KvTErihw5irstHDNwEY3xRcULu9uKxhCAL/kb5foe68ukz2Tf8CTvKLBM4z8MdLPnSjuelVRuQfSJUon4FDn9TF/Kt5AVrs="
     on:
       tags: false
       repo: jjyyxx/JSONSchemaSimulator
       branch: develop
-    api_key:
-      secure: "Yqekh15UaE0f31yfOk5RPGKqT8sFsdqkAWIyDzMSwFwYq1uLe3KGX/M/rCKpvgqiK6Q15PY/7ZJitAxPmzaZpsOhp9RkvvMpFnMkOYyg1mPIwJvtfe/f75AS9FMo0EJ/4QqAISp+AbLR3TgOax+GY223mH3cz+0AAzWUbp1sQqGWX7pBZnd7IKEt3mLg684tbXwejs2yiEBsQ9SnYdbb4orPdO1dAlqwidMhqPh+ImNKsJGEa0exQlqvkMVENnhtq5nIK5gNsuO+eVVRDr4yu/HlTw04WnPuCaIx7S6ajSThv662cSPvyNibMXoQOfaUZ+zkVHLsPq8/UKowSGfRo9H5F87y1jV+dDUUWoY/oz8nkuJTvehJoj+l82svP4NFNueZiT6MLeX8GAEms4v4YyVFtKLBVIoJE0IYY5CIBXG3Jh+wiDfENipcfGpuwGG/04L6v+SF/cmV3AJK5DizdEIwexXonzuMQQf9abGA9h/Yre7cTytj8OdE9Hf1HVEGXvUnZqKdOURn3IMUE+68LBK4nz4n3nySJvHxev9V2U2ckaurUPeX4YDhjGPIeXeHFtVSeVcaXlC89MRkHQO+3fnLo8edEcAJeQpLuOry/dgQduuUAD27P/fjXs30//0zFkxpidpM4UoAzGGUMJRQlgrKBpCUoohagSR7mrZ4bYQ="

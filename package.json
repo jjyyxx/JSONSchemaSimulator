@@ -1,6 +1,6 @@
 {
-  "name": "schema-generator",
-  "version": "1.0.0",
+  "name": "json-schema-simulator",
+  "version": "0.0.2",
   "description": "Generate random objects based on json schema",
   "main": "dist/index.js",
   "scripts": {
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jjyyxx/SchemaGenerator.git"
+    "url": "git+https://github.com/jjyyxx/JSONSchemaSimulator.git"
   },
   "keywords": [
     "json-schema"
@@ -19,9 +19,9 @@
   "author": "jjyyxx",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jjyyxx/SchemaGenerator/issues"
+    "url": "https://github.com/jjyyxx/JSONSchemaSimulator/issues"
   },
-  "homepage": "https://github.com/jjyyxx/SchemaGenerator#readme",
+  "homepage": "https://github.com/jjyyxx/JSONSchemaSimulator#readme",
   "dependencies": {
     "json-schema-ref-parser": "^5.1.1"
   },

@@ -4,16 +4,17 @@ import {
   MIN_INTEGER, MIN_ITEMS, MIN_LENGTH, MIN_NUMBER
 } from '../src/config'
 import { generate, getConstOrEnum, JSONSchema6WithTarget, shrink, typeGenerate, TypeGenerators } from '../src/generate'
+import { normalize } from '../src/options'
 
 describe('Generator types test', () => {
   it('should generate BOOLEAN correctly', () => {
-    expect(typeof TypeGenerators.boolean({}, [])).toBe('boolean')
+    expect(typeof TypeGenerators.boolean({}, normalize({}))).toBe('boolean')
   })
   it('should generate INTEGER correctly', () => {
     for (let i = 0; i < 20; ++i) {
       const res1 = TypeGenerators.integer({
         type: 'integer'
-      }, [])
+      }, normalize({}))
       expect(Number.isInteger(res1)).toBe(true)
       expect(res1).toBeGreaterThanOrEqual(MIN_INTEGER)
       expect(res1).toBeLessThanOrEqual(MAX_INTEGER)
@@ -22,7 +23,7 @@ describe('Generator types test', () => {
         type: 'integer',
         maximum: 3,
         minimum: 2
-      }, [])
+      }, normalize({}))
       expect(Number.isInteger(res2)).toBe(true)
       expect(res2).toBeGreaterThanOrEqual(2)
       expect(res2).toBeLessThanOrEqual(3)
@@ -31,18 +32,18 @@ describe('Generator types test', () => {
         type: 'integer',
         maximum: 2,
         minimum: 3
-      }, [])
+      }, normalize({}))
       expect(res3).toBeNaN()
     }
   })
   it('should generate NULL correctly', () => {
-    expect(TypeGenerators.null({}, [])).toBeNull()
+    expect(TypeGenerators.null({}, normalize({}))).toBeNull()
   })
   it('should generate NUMBER correctly', () => {
     for (let i = 0; i < 20; ++i) {
       const res1 = TypeGenerators.number({
         type: 'number'
-      }, [])
+      }, normalize({}))
       expect(res1).toBeGreaterThanOrEqual(MIN_NUMBER)
       expect(res1).toBeLessThanOrEqual(MAX_NUMBER)
 
@@ -50,7 +51,7 @@ describe('Generator types test', () => {
         type: 'number',
         maximum: 5.6,
         minimum: 3.2
-      }, [])
+      }, normalize({}))
       expect(res2).toBeGreaterThanOrEqual(3.2)
       expect(res2).toBeLessThanOrEqual(5.6)
 
@@ -58,7 +59,7 @@ describe('Generator types test', () => {
         type: 'number',
         maximum: 3.2,
         minimum: 5.6
-      }, [])
+      }, normalize({}))
       expect(res3).toBeNaN()
     }
   })
@@ -66,7 +67,7 @@ describe('Generator types test', () => {
     for (let i = 0; i < 20; ++i) {
       const res1 = TypeGenerators.string({
         type: 'string'
-      }, [])
+      }, normalize({}))
       expect(res1.length).toBeGreaterThanOrEqual(MIN_LENGTH)
       expect(res1.length).toBeLessThanOrEqual(MAX_LENGTH)
 
@@ -74,14 +75,14 @@ describe('Generator types test', () => {
         type: 'string',
         maxLength: 6,
         minLength: 3
-      }, [])
+      }, normalize({}))
       expect(res2).toMatch(/[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789]{3,6}/)
 
       const res3 = TypeGenerators.string({
         type: 'string',
         maxLength: 3,
         minLength: 6
-      }, [])
+      }, normalize({}))
       expect(res3).toBe('')
     }
   })
@@ -92,7 +93,7 @@ describe('Generator types test', () => {
         type: 'array',
         target: []
       }
-      const res1 = TypeGenerators.array(schema1, [])
+      const res1 = TypeGenerators.array(schema1, normalize({}))
       expect(res1.length).toBeGreaterThanOrEqual(MIN_ITEMS)
       expect(res1.length).toBeLessThanOrEqual(MAX_ITEMS)
       expect(schema1.target).toBe(res1)
@@ -112,7 +113,7 @@ describe('Generator types test', () => {
         }],
         target: []
       }
-      const res2 = TypeGenerators.array(schema2, [])
+      const res2 = TypeGenerators.array(schema2, normalize({}))
       expect(res2).toHaveLength(3)
       expect(schema2.target).toBe(res2)
       expect(Number.isInteger(res2[0])).toBe(true)
@@ -128,7 +129,7 @@ describe('Generator types test', () => {
         type: 'object',
         target: {}
       }
-      const res1 = TypeGenerators.object(schema1, [])
+      const res1 = TypeGenerators.object(schema1, normalize({}))
       expect(res1).toEqual({})
       expect(schema1.target).toBe(res1)
 
@@ -137,7 +138,7 @@ describe('Generator types test', () => {
         required: ['notExist'],
         target: {}
       }
-      const res2 = TypeGenerators.object(schema2, [])
+      const res2 = TypeGenerators.object(schema2, normalize({}))
       expect(res2).toEqual({})
       expect(schema2.target).toBe(res2)
 
@@ -162,7 +163,7 @@ describe('Generator types test', () => {
         },
         target: {}
       }
-      const res3 = TypeGenerators.object(schema3, [])
+      const res3 = TypeGenerators.object(schema3, normalize({}))
       expect(res3).toHaveProperty('exist1')
       expect(res3).toHaveProperty('exist2')
       expect(Number.isInteger(res3.exist1)).toBe(true)
@@ -308,7 +309,7 @@ describe('Generator typeGenerate test', () => {
     for (let i = 0; i < 5; ++i) {
       const schema = schemas[i]
       const resultType = resultTypes[i]
-      const result = typeGenerate(schema, [])
+      const result = typeGenerate(schema, normalize({}))
       expect(typeof result).toBe(resultType)
     }
   })
@@ -317,22 +318,22 @@ describe('Generator typeGenerate test', () => {
     const schema: JSONSchema6 = {
       type: 'array'
     }
-    const queue: JSONSchema6WithTarget[] = []
-    const result = typeGenerate(schema, queue)
+    const options = normalize({})
+    const result = typeGenerate(schema, options)
     expect(result).toEqual([])
-    expect(queue).toHaveLength(1)
-    expect(queue[0].target).toBe(result)
+    expect(options.queue).toHaveLength(1)
+    expect(options.queue[0].target).toBe(result)
   })
 
   it('deals with object correctly', () => {
     const schema: JSONSchema6 = {
       type: 'object'
     }
-    const queue: JSONSchema6WithTarget[] = []
-    const result = typeGenerate(schema, queue)
+    const options = normalize({})
+    const result = typeGenerate(schema, options)
     expect(result).toEqual({})
-    expect(queue).toHaveLength(1)
-    expect(queue[0].target).toBe(result)
+    expect(options.queue).toHaveLength(1)
+    expect(options.queue[0].target).toBe(result)
   })
 })
 
@@ -351,7 +352,7 @@ describe('Generator core test', () => {
       minItems: 4,
       maxItems: 4
     }
-    const result = generate(schema)
+    const result = generate(schema, normalize({}))
     expect(result).toHaveLength(4)
     for (const obj of result) {
       expect(Object.keys(obj)).toEqual(['foo'])
@@ -363,20 +364,20 @@ describe('Generator core test', () => {
     const schema1: JSONSchema6 = {
       const: 1
     }
-    const result1 = generate(schema1)
+    const result1 = generate(schema1, normalize({}))
     expect(result1).toBe(1)
 
     const schema2: JSONSchema6 = {
       enum: ['foo']
     }
-    const result2 = generate(schema2)
+    const result2 = generate(schema2, normalize({}))
     expect(result2).toBe('foo')
 
     const schema3: JSONSchema6 = {
       maximum: 4,
       minimum: 4
     }
-    const result3 = generate(schema3)
+    const result3 = generate(schema3, normalize({}))
     expect(result3).toBe(4)
   })
 })

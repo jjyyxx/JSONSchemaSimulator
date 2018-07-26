@@ -9,6 +9,7 @@ before_install:
 install:
 - npm i
 - npm i -g codecov
+- npm i -g @octokit/rest
 script:
 - npm run lint
 - npm run build

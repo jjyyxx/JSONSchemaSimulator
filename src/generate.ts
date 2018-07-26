@@ -4,6 +4,7 @@ import {
   MAX_NUMBER, MIN_INTEGER, MIN_ITEMS, MIN_LENGTH, MIN_NUMBER
 } from './config'
 import { infer } from './infer'
+import { OptionType } from './options'
 import { getRandom, getRandomElement, getRandomInt } from './util'
 
 type JSONSchema6WithType = JSONSchema6 & { type: JSONSchema6TypeName }
@@ -46,46 +47,45 @@ export function getConstOrEnum(schema: JSONSchema6): JSONSchema6Type | undefined
   }
 }
 
-export function typeGenerate(schema: JSONSchema6, queue: JSONSchema6WithTarget[]) {
+export function typeGenerate(schema: JSONSchema6, options: OptionType) {
   const shrinked = <JSONSchema6WithTarget>shrink(schema)
   switch (shrinked.type) {
     case 'array':
-      queue.push(shrinked)
+      options.queue.push(shrinked)
       return shrinked.target = []
     case 'object':
-      queue.push(shrinked)
+      options.queue.push(shrinked)
       return shrinked.target = {}
     default:
-      return shrinked.target = TypeGenerators[<ConcreteTypes>shrinked.type](shrinked, queue)
+      return shrinked.target = TypeGenerators[<ConcreteTypes>shrinked.type](shrinked, options)
   }
 }
 
-export function subGenerate(sub: JSONSchema6, queue: JSONSchema6WithTarget[]) {
+export function subGenerate(sub: JSONSchema6, options: OptionType) {
   const value = getConstOrEnum(sub)
-  return value === undefined ? typeGenerate(sub, queue) : value
+  return value === undefined ? typeGenerate(sub, options) : value
 }
 
-export function generate(rootSchema: JSONSchema6): any {
+export function generate(rootSchema: JSONSchema6, options: OptionType): any {
   const value = getConstOrEnum(rootSchema)
   if (value !== undefined) {
     return value
   }
-  const queue: JSONSchema6WithTarget[] = []
-  const result = typeGenerate(rootSchema, queue)
+  const result = typeGenerate(rootSchema, options)
   let schema
-  if (schema = queue.shift()) {
+  if (schema = options.queue.shift()) {
     ENV.level = 0
-    TypeGenerators[<ConcreteTypes>schema.type](schema, queue)
-    let levelNum = queue.length
-    while (schema = queue.shift()) {
+    TypeGenerators[<ConcreteTypes>schema.type](schema, options)
+    let levelNum = options.queue.length
+    while (schema = options.queue.shift()) {
       const shrinked = shrink(schema)
-      TypeGenerators[<ConcreteTypes>shrinked.type](shrinked, queue)
+      TypeGenerators[<ConcreteTypes>shrinked.type](shrinked, options)
 
       --levelNum
       if (levelNum === 0) {
         ++ENV.level
         // if (level > MAX_LEVELS) break
-        levelNum = queue.length
+        levelNum = options.queue.length
         // TODO: further add possibility constraint based on level
       }
     }
@@ -94,13 +94,13 @@ export function generate(rootSchema: JSONSchema6): any {
 }
 
 export const TypeGenerators: {
-  [key in ConcreteTypes]: (schema: JSONSchema6, queue: JSONSchema6WithTarget[]) => any
+  [key in ConcreteTypes]: (schema: JSONSchema6, options: OptionType) => any
 } = {
-  array(schema: JSONSchema6, queue: JSONSchema6WithTarget[]) {
+  array(schema: JSONSchema6, options: OptionType) {
     const target = <any[]>((<JSONSchema6WithTarget>schema).target)
     if (schema.items && Array.isArray(schema.items)) {
       target.push(...schema.items.map((sub) => {
-        return subGenerate(sub, queue)
+        return subGenerate(sub, options)
       }))
     } else {
       const minItems = schema.minItems === undefined ? MIN_ITEMS : schema.minItems
@@ -109,7 +109,7 @@ export const TypeGenerators: {
       if (schema.items) {
         const sub = <JSONSchema6>schema.items
         while (num--) {
-          target.push(subGenerate(sub, queue))
+          target.push(subGenerate(sub, options))
         }
       } else {
         while (num--) {
@@ -135,14 +135,14 @@ export const TypeGenerators: {
     const max = schema.maximum === undefined ? MAX_NUMBER : schema.maximum
     return getRandom(min, max)
   },
-  object(schema: JSONSchema6, queue: JSONSchema6WithTarget[]) {
+  object(schema: JSONSchema6, options: OptionType) {
     const target = <{ [key: string]: string }>((<JSONSchema6WithTarget>schema).target)
     if (schema.required !== undefined && schema.properties !== undefined) {
       for (const key of schema.required) {
         if (key in schema.properties) {
           const sub = schema.properties[key]
           if (typeof sub === 'object') {
-            target[key] = subGenerate(sub, queue)
+            target[key] = subGenerate(sub, options)
           }
         }
       }

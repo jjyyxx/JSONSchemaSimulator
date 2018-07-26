@@ -1,8 +1,4 @@
 import { JSONSchema6 } from 'json-schema'
-import {
-  MAX_INTEGER, MAX_ITEMS, MAX_LENGTH, MAX_NUMBER,
-  MIN_INTEGER, MIN_ITEMS, MIN_LENGTH, MIN_NUMBER
-} from '../src/config'
 import { generate, getConstOrEnum, JSONSchema6WithTarget, shrink, typeGenerate, TypeGenerators } from '../src/generate'
 import { normalize } from '../src/options'
 
@@ -11,13 +7,14 @@ describe('Generator types test', () => {
     expect(typeof TypeGenerators.boolean({}, normalize({}))).toBe('boolean')
   })
   it('should generate INTEGER correctly', () => {
+    const options = normalize({})
     for (let i = 0; i < 20; ++i) {
       const res1 = TypeGenerators.integer({
         type: 'integer'
-      }, normalize({}))
+      }, options)
       expect(Number.isInteger(res1)).toBe(true)
-      expect(res1).toBeGreaterThanOrEqual(MIN_INTEGER)
-      expect(res1).toBeLessThanOrEqual(MAX_INTEGER)
+      expect(res1).toBeGreaterThanOrEqual(options.limits.minInteger)
+      expect(res1).toBeLessThanOrEqual(options.limits.maxInteger)
 
       const res2 = TypeGenerators.integer({
         type: 'integer',
@@ -41,11 +38,12 @@ describe('Generator types test', () => {
   })
   it('should generate NUMBER correctly', () => {
     for (let i = 0; i < 20; ++i) {
+      const options = normalize({})
       const res1 = TypeGenerators.number({
         type: 'number'
-      }, normalize({}))
-      expect(res1).toBeGreaterThanOrEqual(MIN_NUMBER)
-      expect(res1).toBeLessThanOrEqual(MAX_NUMBER)
+      }, options)
+      expect(res1).toBeGreaterThanOrEqual(options.limits.minNumber)
+      expect(res1).toBeLessThanOrEqual(options.limits.maxNumber)
 
       const res2 = TypeGenerators.number({
         type: 'number',
@@ -65,11 +63,12 @@ describe('Generator types test', () => {
   })
   it('should generate STRING correctly', () => {
     for (let i = 0; i < 20; ++i) {
+      const options = normalize({})
       const res1 = TypeGenerators.string({
         type: 'string'
-      }, normalize({}))
-      expect(res1.length).toBeGreaterThanOrEqual(MIN_LENGTH)
-      expect(res1.length).toBeLessThanOrEqual(MAX_LENGTH)
+      }, options)
+      expect(res1.length).toBeGreaterThanOrEqual(options.limits.minLength)
+      expect(res1.length).toBeLessThanOrEqual(options.limits.maxLength)
 
       const res2 = TypeGenerators.string({
         type: 'string',
@@ -89,13 +88,14 @@ describe('Generator types test', () => {
 
   it('should generate ARRAY correctly', () => {
     for (let i = 0; i < 20; ++i) {
+      const options = normalize({})
       const schema1: JSONSchema6WithTarget = {
         type: 'array',
         target: []
       }
-      const res1 = TypeGenerators.array(schema1, normalize({}))
-      expect(res1.length).toBeGreaterThanOrEqual(MIN_ITEMS)
-      expect(res1.length).toBeLessThanOrEqual(MAX_ITEMS)
+      const res1 = TypeGenerators.array(schema1, options)
+      expect(res1.length).toBeGreaterThanOrEqual(options.limits.minItems)
+      expect(res1.length).toBeLessThanOrEqual(options.limits.maxItems)
       expect(schema1.target).toBe(res1)
 
       const schema2: JSONSchema6WithTarget = {
@@ -187,7 +187,7 @@ describe('Generator shrink test', () => {
         type: 'boolean'
       }]
     }
-    const shrinked = shrink(schema)
+    const shrinked = shrink(schema, normalize({}))
     expect(shrinked).toHaveProperty('type')
     expect(shrinked).not.toHaveProperty('anyOf')
     expect(['string', 'boolean'].includes(shrinked.type)).toBe(true)
@@ -201,7 +201,7 @@ describe('Generator shrink test', () => {
         type: 'boolean'
       }]
     }
-    const shrinked = shrink(schema)
+    const shrinked = shrink(schema, normalize({}))
     expect(schema).toEqual({
       anyOf: [{
         type: 'string'
@@ -219,7 +219,7 @@ describe('Generator shrink test', () => {
         }]
       }]
     }
-    const shrinked = shrink(schema)
+    const shrinked = shrink(schema, normalize({}))
     expect(shrinked).toEqual({
       type: 'boolean'
     })
@@ -229,7 +229,7 @@ describe('Generator shrink test', () => {
     const schema: JSONSchema6 = {
       anyOf: []
     }
-    const shrinked = shrink(schema)
+    const shrinked = shrink(schema, normalize({}))
     expect(shrinked).toHaveProperty('type')
     delete shrinked.type
     expect(shrinked).toEqual({})
@@ -250,7 +250,7 @@ describe('Generator shrink test', () => {
         type: 'integer'
       }]
     }
-    const shrinked = shrink(schema)
+    const shrinked = shrink(schema, normalize({}))
     if (shrinked.type === 'number') {
       expect(shrinked).toEqual({
         type: 'number',
@@ -321,8 +321,8 @@ describe('Generator typeGenerate test', () => {
     const options = normalize({})
     const result = typeGenerate(schema, options)
     expect(result).toEqual([])
-    expect(options.queue).toHaveLength(1)
-    expect(options.queue[0].target).toBe(result)
+    expect(options.env.queue).toHaveLength(1)
+    expect(options.env.queue[0].target).toBe(result)
   })
 
   it('deals with object correctly', () => {
@@ -332,8 +332,8 @@ describe('Generator typeGenerate test', () => {
     const options = normalize({})
     const result = typeGenerate(schema, options)
     expect(result).toEqual({})
-    expect(options.queue).toHaveLength(1)
-    expect(options.queue[0].target).toBe(result)
+    expect(options.env.queue).toHaveLength(1)
+    expect(options.env.queue[0].target).toBe(result)
   })
 })
 

@@ -1,7 +1,7 @@
 import { JSONSchema6 } from 'json-schema'
-import { INTEGER_NUMBER_INFER_PREFERENCE } from './config'
+import { OptionType } from './options'
 
-type InferableTypes = 'array' | 'object' | 'string' | typeof INTEGER_NUMBER_INFER_PREFERENCE
+type InferableTypes = 'array' | 'object' | 'string' | 'number'
 const inferableProperties: {
   [key in InferableTypes]: string[]
 } = {
@@ -12,7 +12,7 @@ const inferableProperties: {
     'minItems',
     'uniqueItems'
   ],
-  [INTEGER_NUMBER_INFER_PREFERENCE]: [
+  number: [
     'exclusiveMaximum',
     'exclusiveMinimum',
     'maximum',
@@ -37,11 +37,11 @@ const inferableProperties: {
 
 const inferableTypes = <InferableTypes[]>Object.keys(inferableProperties)
 
-export function infer(schema: JSONSchema6): InferableTypes | 'any' {
+export function infer(schema: JSONSchema6, options: OptionType): InferableTypes | 'integer' | 'any' {
   const schemaKeys = Object.keys(schema)
   for (const typeName of inferableTypes) {
     if (schemaKeys.some((prop) => inferableProperties[typeName].includes(prop))) {
-      return typeName
+      return typeName === 'number' ? options.infer.numPreference : typeName
     }
   }
   return 'any'

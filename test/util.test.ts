@@ -1,4 +1,4 @@
-import { getRandom, getRandomElement, getRandomInt } from '../src/util'
+import { clone, getRandom, getRandomElement, getRandomInt, getType, merge } from '../src/util'
 
 describe('Basic random utility', () => {
   it('should get random number in an inclusive range', () => {
@@ -28,5 +28,37 @@ describe('Basic random utility', () => {
     }
     const o = {}
     expect(getRandomElement([o])).toBe(o)
+  })
+})
+
+describe('Deep merge & clone utility', () => {
+  it('classify type correctly', () => {
+    expect(getType({})).toBe('object')
+    expect(getType([])).toBe('array')
+    expect(getType(null)).toBe('others')
+    expect(getType('')).toBe('others')
+    expect(getType(0)).toBe('others')
+    expect(getType(undefined)).toBe('undefined')
+  })
+
+  it('merge object correctly', () => {
+    expect(merge(1, 2)).toBe(2)
+    expect(merge(1, [])).toBe(1)
+    expect(merge(1, undefined)).toBe(1)
+
+    expect(merge({}, {})).toEqual({})
+    expect(merge({}, { not: 1 })).toEqual({})
+    expect(merge({ foo: 1 }, {})).toEqual({ foo: 1 })
+    expect(merge({ foo: 1 }, { foo: 2 })).toEqual({ foo: 2 })
+    expect(merge({ foo: { bar: 1 } }, { foo: 1 })).toEqual({ foo: { bar: 1 } })
+    expect(merge({ foo: { bar: 1 } }, { foo: { bar: 2 } })).toEqual({ foo: { bar: 2 } })
+  })
+
+  it('clones any correctly', () => {
+    // tslint:disable-next-line:no-empty
+    const tests = [{foo: [{bar: 1}]}, {}, [], '', 1, null, undefined, () => {}]
+    for (const test of tests) {
+      expect(clone(test)).toEqual(test)
+    }
   })
 })

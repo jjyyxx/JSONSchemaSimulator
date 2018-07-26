@@ -1,7 +1,28 @@
 import { JSONSchema6WithTarget } from './generate'
+import { merge } from './util'
 
 const defaults = {
-  generationLimit: -1
+  generationLimit: -1,
+  limits: {
+    minInteger: -100000000,
+    maxInteger: 100000000,
+
+    minNumber: -100,
+    maxNumber: 100,
+
+    minLength: 0,
+    maxLength: 20,
+
+    minItems: 0,
+    maxItems: 20
+  },
+  infer: {
+    numPreference: <'integer' | 'number'>'integer'
+  },
+  maxLevels: -1,
+  getConstrainedItems(): number {
+    return Math.floor(this.limits.maxItems / (1 + (<any>this).env.level))
+  }
 }
 const optionKeys = <OptionKey[]>Object.keys(defaults)
 
@@ -11,15 +32,17 @@ type UserOptionType = {
 }
 export type PartialOptionType = Partial<OptionType>
 export type OptionType = UserOptionType & {
-  queue: Pick<JSONSchema6WithTarget[], 'length' | 'shift' | 'push'>
+  env: {
+    queue: Pick<JSONSchema6WithTarget[], 'length' | 'shift' | 'push'>,
+    level: number
+  }
 }
 
 export function normalize(options: PartialOptionType): OptionType {
-  const result = <OptionType>{}
-  for (const key of optionKeys) {
-    const option = options[key]
-    result[key] = option === undefined ? defaults[key] : option
+  const result = <OptionType>merge(defaults, options)
+  result.env = {
+    queue: [],
+    level: 0
   }
-  result.queue = []
   return result
 }

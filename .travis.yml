@@ -19,3 +19,10 @@ deploy:
     on:
       repo: jjyyxx/JSONSchemaSimulator
       branch: master
+  # - provider: releases
+  #   file: ''
+  #   api_key:
+  #     secure: "wQUkEp+RLgXcEBhiJbEKdz7GecEaTy9hpnLtnuPRGPqMuwrSXduV4kakbDvawcYs38IoEwTyE6in4CB9bVQiT6gMbI92W7uD751hjHN31YRKMLP4rpK1S1s3ZjNGZYK2xWKhM9sctUYP71dRjPMEOOXUcU6VxtSKKXwzhOWVvbOeP+vNan3L7JXoZ8bPNJyF7puhFy0yfuwvDYkQOPgLNr724MHYn68O8E+1TpXEP5vEYCvz72vZLuqGUejmRCEg3XLVPvdT0wgk8AcJN5igl0L00OV3njdKdMf4J8S0EEElRzGj9RgrJho2hMzkxS7OP0hxpwMZzfxh6sS1DmE8F3htVv05ltQZT7riCqjQaCkC1UHNlbg36mBmhqkm5IBHzk1/U4Zv4mDBdERuUNOXDrMCqBKgRqEUAx/eQKd3nOzoxRltoW2Ohn/ZGy8QVieQPjXw+c8mQTNH73E+83QSdVXyH+1mGAjFFz5+bVTHzrtdT7E1fHky7wju4V2qhI5vVVPBXFqfo9yFHs8L5aLeiiiHPPSmt6MWsIgrF+oNWYxuR3jluGkAuQf8yTipFgx72YHjrFa7xyo98iTmXCk0gHCmxVMtmc95kj9N1TJ3FvcDPhIt3t+tXjkBpPxtdrsSe0AJU7mMJb2hLQdbpb1LREdqRAJK52gBN7YHBnWdn9k="
+  #   on:
+  #     repo: jjyyxx/JSONSchemaSimulator
+  #     branch: master

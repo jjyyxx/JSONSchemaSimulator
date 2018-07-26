@@ -10,9 +10,15 @@ if (TRAVIS_PULL_REQUEST && TRAVIS_BRANCH === 'master') {
     if (previous === current) {
       console.log('The version number did not increase')
       process.exit(1)
+    } else {
+      console.log(`The version number increases from ${previous} to ${current}`)
+      process.exit(0)
     }
   } else {
     console.log('Only develop can be merged into master')
     process.exit(1)
   }
+} else {
+  console.log('Not a deploy-related commit')
+  process.exit(0)
 }

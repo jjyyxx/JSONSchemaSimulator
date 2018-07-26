@@ -1,6 +1,9 @@
 language: node_js
 node_js:
 - node
+env:
+  global:
+    - secure: "IydPDxblPt5s2Si4ViBGDkydr2OGP7IASFHS9ocAWXruXjQ6rCJrrVJlpI3M8MC4URilwzSSNvQzmvtlYgDGHscyx3ui5dCwwasf2XGHQMwxK0u02YiDNdWmx53XJIL1p6G6suDrhjqAJPkJh9PUFn8YpOEEQ07PZZQEdMimdEC8kIxCjqtHmwYSGEjJxiNsHPKgJmaSRAY6FY69Yb+mAQfMWL5HIziVazDldNubBXBHDEsR3aWawAKYmGrkhUgHlK6R2EYtwJppaMtHvEmZ8Ajdwngfd3RobUdUNh+YC9oF0aQV/HrbxjLzE1yGhlh1sV/QOQpa6oJOM6ZIq8Fxlb67WhG7kjGvIAo9+NWwULK1geVo6zSQQ48ZEydW9/G/n1yYu6sLsefworJ2uFRaI2uLcn3078909csT7FmfP1tlg6AKsc7AAzgqy3Ruw8CgZV/efNr2yLvBE1gMl4Zzkp08U6SY2HI4TjD6Sni7y0UC6+P7F7u8SJMMYKSWXh3PuiiSzsgBucTpCOzXkAgOlHc/ikug+q6HGABbGwGRb29rAqC//mp5d+J5aOW1rz39rjbGN9E6vqs6Ov3NH6CaZHmtsNtaYNFaknRyRrKfhq5Q+UK4/65dZVKGbuif0frtRaJNIz7JLgzp/JyipO3qs/NLmOToZlXRG7cXuwrrCsk="
 before_install:
 - node ./bin/version_check.js
 install:
@@ -19,10 +22,8 @@ deploy:
     on:
       repo: jjyyxx/JSONSchemaSimulator
       branch: master
-  # - provider: releases
-  #   file: ''
-  #   api_key:
-  #     secure: "wQUkEp+RLgXcEBhiJbEKdz7GecEaTy9hpnLtnuPRGPqMuwrSXduV4kakbDvawcYs38IoEwTyE6in4CB9bVQiT6gMbI92W7uD751hjHN31YRKMLP4rpK1S1s3ZjNGZYK2xWKhM9sctUYP71dRjPMEOOXUcU6VxtSKKXwzhOWVvbOeP+vNan3L7JXoZ8bPNJyF7puhFy0yfuwvDYkQOPgLNr724MHYn68O8E+1TpXEP5vEYCvz72vZLuqGUejmRCEg3XLVPvdT0wgk8AcJN5igl0L00OV3njdKdMf4J8S0EEElRzGj9RgrJho2hMzkxS7OP0hxpwMZzfxh6sS1DmE8F3htVv05ltQZT7riCqjQaCkC1UHNlbg36mBmhqkm5IBHzk1/U4Zv4mDBdERuUNOXDrMCqBKgRqEUAx/eQKd3nOzoxRltoW2Ohn/ZGy8QVieQPjXw+c8mQTNH73E+83QSdVXyH+1mGAjFFz5+bVTHzrtdT7E1fHky7wju4V2qhI5vVVPBXFqfo9yFHs8L5aLeiiiHPPSmt6MWsIgrF+oNWYxuR3jluGkAuQf8yTipFgx72YHjrFa7xyo98iTmXCk0gHCmxVMtmc95kj9N1TJ3FvcDPhIt3t+tXjkBpPxtdrsSe0AJU7mMJb2hLQdbpb1LREdqRAJK52gBN7YHBnWdn9k="
-  #   on:
-  #     repo: jjyyxx/JSONSchemaSimulator
-  #     branch: master
+  - provider: script
+    script: node ./bin/auto_release.js
+    on:
+      repo: jjyyxx/JSONSchemaSimulator
+      branch: master

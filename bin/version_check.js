@@ -4,7 +4,7 @@ const { execSync } = require('child_process')
 const { TRAVIS_BRANCH, TRAVIS_PULL_REQUEST, TRAVIS_PULL_REQUEST_BRANCH, TRAVIS_PULL_REQUEST_SHA } = process.env
 
 if (TRAVIS_PULL_REQUEST && TRAVIS_BRANCH === 'master') {
-  const previous = execSync('npm show json-schema-simulator version')
+  const previous = execSync('npm show json-schema-simulator version').toString('utf8').trim()
   const current = JSON.parse(execSync(`git show ${TRAVIS_PULL_REQUEST_SHA}:package.json`).toString('utf8')).version
   if (previous === current) {
     console.log('The version number did not increase')

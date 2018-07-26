@@ -1,9 +1,15 @@
 language: node_js
 node_js:
 - node
+env:
+  global:
+    - secure: "IydPDxblPt5s2Si4ViBGDkydr2OGP7IASFHS9ocAWXruXjQ6rCJrrVJlpI3M8MC4URilwzSSNvQzmvtlYgDGHscyx3ui5dCwwasf2XGHQMwxK0u02YiDNdWmx53XJIL1p6G6suDrhjqAJPkJh9PUFn8YpOEEQ07PZZQEdMimdEC8kIxCjqtHmwYSGEjJxiNsHPKgJmaSRAY6FY69Yb+mAQfMWL5HIziVazDldNubBXBHDEsR3aWawAKYmGrkhUgHlK6R2EYtwJppaMtHvEmZ8Ajdwngfd3RobUdUNh+YC9oF0aQV/HrbxjLzE1yGhlh1sV/QOQpa6oJOM6ZIq8Fxlb67WhG7kjGvIAo9+NWwULK1geVo6zSQQ48ZEydW9/G/n1yYu6sLsefworJ2uFRaI2uLcn3078909csT7FmfP1tlg6AKsc7AAzgqy3Ruw8CgZV/efNr2yLvBE1gMl4Zzkp08U6SY2HI4TjD6Sni7y0UC6+P7F7u8SJMMYKSWXh3PuiiSzsgBucTpCOzXkAgOlHc/ikug+q6HGABbGwGRb29rAqC//mp5d+J5aOW1rz39rjbGN9E6vqs6Ov3NH6CaZHmtsNtaYNFaknRyRrKfhq5Q+UK4/65dZVKGbuif0frtRaJNIz7JLgzp/JyipO3qs/NLmOToZlXRG7cXuwrrCsk="
+before_install:
+- node ./bin/version_check.js
 install:
 - npm i
 - npm i -g codecov
+- npm i -g @octokit/rest
 script:
 - npm run lint
 - npm run build
@@ -14,6 +20,11 @@ deploy:
     email: obfishstudio@gmail.com
     api_key:
       secure: "pvbgDltddC7Gh3rJN455lC28K+PQJSBnpEE72x971wWLIRnZXLmi3eoEA+cMhUd4NMT4lWQgp65NV5wNJQVtLWPdQ+3sq1NWY9k65SPa7YUjZebeIBAnQAr3kVUEoIHAnzL2dHVVnkUkKcTmqM7EPPV2fldgkMKPJBdaXesG1orRM+JmAmuLTMK80jI++zKyB8KXic/FDxWdmMbAEBlS3IqZryzG9LcN0PF1AKDgJQdwybB/bX0Jeq95j/lvj1JU/fMUsga7kjqB+GzsTTfScsXpFA5964EIPpGiqY9frgtTLdmTUlWx7axivNwbKvK67GZke12o9T0AWUkTkXNX5yC5dtTQ9cPSKRpTKdDdymJZg11KDoS3ypCa+THip0edSTmg25iwqXSYZ2fXcDU6/lno+1V/f5znJ21FNX3wVHr7HPmvBXys8GdwViwtuV+VEA9gdIet6L2WvYx2dC2W1NHFwb5wU5/93Am28Awwo+eDvmQ9Y0Vm/HNeNrxBF2JuY5HPT6Vl0omn3Z2AcfsB+gdVVVa197rrf8cmZvLbybTLbNwTbujSCN+fuU1mKR3Onm4n07/gMAJa7dJ8xD3/fp541cfQqIAlxs95AaNxn/ttxB5iZyl4DBFs/XH2p+UWwFsqjNwqVMfHWM7ioWGG3v5Ijrfq6J8rqXipxgYMJDI="
+    on:
+      repo: jjyyxx/JSONSchemaSimulator
+      branch: master
+  - provider: script
+    script: node ./bin/auto_release.js
     on:
       repo: jjyyxx/JSONSchemaSimulator
       branch: master

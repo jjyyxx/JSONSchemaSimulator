@@ -1,6 +1,6 @@
 {
   "name": "json-schema-simulator",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Generate random objects based on json schema",
   "main": "dist/index.js",
   "scripts": {

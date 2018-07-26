@@ -1,9 +1,6 @@
 import { JSONSchema6, JSONSchema6Type, JSONSchema6TypeName } from 'json-schema'
-import {
-  ENV, MAX_INTEGER, MAX_ITEMS, MAX_LENGTH, MAX_LEVELS,
-  MAX_NUMBER, MIN_INTEGER, MIN_ITEMS, MIN_LENGTH, MIN_NUMBER
-} from './config'
 import { infer } from './infer'
+import { OptionType } from './options'
 import { getRandom, getRandomElement, getRandomInt } from './util'
 
 type JSONSchema6WithType = JSONSchema6 & { type: JSONSchema6TypeName }
@@ -13,7 +10,7 @@ export type JSONSchema6WithTarget = JSONSchema6WithType & { target: any[] | obje
 export const ConcreteTypes: JSONSchema6TypeName[] =
   ['array', 'boolean', 'integer', 'null', 'number', 'object', 'string']
 
-export function shrink(schema: JSONSchema6): JSONSchema6WithType {
+export function shrink(schema: JSONSchema6, options: OptionType): JSONSchema6WithType {
   const final: JSONSchema6 = {}
   let temp = Object.assign({}, schema)
   while (temp.anyOf/*  || temp.oneOf || temp.allOf || temp.not */) {
@@ -29,7 +26,7 @@ export function shrink(schema: JSONSchema6): JSONSchema6WithType {
   }
   Object.assign(final, temp)
   if (final.type === undefined) {
-    final.type = infer(final)
+    final.type = infer(final, options)
   }
   if (final.type === 'any') {
     final.type = getRandomElement(ConcreteTypes)
@@ -46,46 +43,45 @@ export function getConstOrEnum(schema: JSONSchema6): JSONSchema6Type | undefined
   }
 }
 
-export function typeGenerate(schema: JSONSchema6, queue: JSONSchema6WithTarget[]) {
-  const shrinked = <JSONSchema6WithTarget>shrink(schema)
+export function typeGenerate(schema: JSONSchema6, options: OptionType) {
+  const shrinked = <JSONSchema6WithTarget>shrink(schema, options)
   switch (shrinked.type) {
     case 'array':
-      queue.push(shrinked)
+      options.env.queue.push(shrinked)
       return shrinked.target = []
     case 'object':
-      queue.push(shrinked)
+      options.env.queue.push(shrinked)
       return shrinked.target = {}
     default:
-      return shrinked.target = TypeGenerators[<ConcreteTypes>shrinked.type](shrinked, queue)
+      return shrinked.target = TypeGenerators[<ConcreteTypes>shrinked.type](shrinked, options)
   }
 }
 
-export function subGenerate(sub: JSONSchema6, queue: JSONSchema6WithTarget[]) {
+export function subGenerate(sub: JSONSchema6, options: OptionType) {
   const value = getConstOrEnum(sub)
-  return value === undefined ? typeGenerate(sub, queue) : value
+  return value === undefined ? typeGenerate(sub, options) : value
 }
 
-export function generate(rootSchema: JSONSchema6): any {
+export function generate(rootSchema: JSONSchema6, options: OptionType): any {
   const value = getConstOrEnum(rootSchema)
   if (value !== undefined) {
     return value
   }
-  const queue: JSONSchema6WithTarget[] = []
-  const result = typeGenerate(rootSchema, queue)
+  const result = typeGenerate(rootSchema, options)
   let schema
-  if (schema = queue.shift()) {
-    ENV.level = 0
-    TypeGenerators[<ConcreteTypes>schema.type](schema, queue)
-    let levelNum = queue.length
-    while (schema = queue.shift()) {
-      const shrinked = shrink(schema)
-      TypeGenerators[<ConcreteTypes>shrinked.type](shrinked, queue)
+  if (schema = options.env.queue.shift()) {
+    options.env.level = 0
+    TypeGenerators[<ConcreteTypes>schema.type](schema, options)
+    let levelNum = options.env.queue.length
+    while (schema = options.env.queue.shift()) {
+      const shrinked = shrink(schema, options)
+      TypeGenerators[<ConcreteTypes>shrinked.type](shrinked, options)
 
       --levelNum
       if (levelNum === 0) {
-        ++ENV.level
+        ++options.env.level
         // if (level > MAX_LEVELS) break
-        levelNum = queue.length
+        levelNum = options.env.queue.length
         // TODO: further add possibility constraint based on level
       }
     }
@@ -94,22 +90,22 @@ export function generate(rootSchema: JSONSchema6): any {
 }
 
 export const TypeGenerators: {
-  [key in ConcreteTypes]: (schema: JSONSchema6, queue: JSONSchema6WithTarget[]) => any
+  [key in ConcreteTypes]: (schema: JSONSchema6, options: OptionType) => any
 } = {
-  array(schema: JSONSchema6, queue: JSONSchema6WithTarget[]) {
+  array(schema: JSONSchema6, options: OptionType) {
     const target = <any[]>((<JSONSchema6WithTarget>schema).target)
     if (schema.items && Array.isArray(schema.items)) {
       target.push(...schema.items.map((sub) => {
-        return subGenerate(sub, queue)
+        return subGenerate(sub, options)
       }))
     } else {
-      const minItems = schema.minItems === undefined ? MIN_ITEMS : schema.minItems
-      const maxItems = schema.maxItems === undefined ? /* MAX_ITEMS */ ENV.constrainedItems : schema.maxItems
+      const minItems = schema.minItems === undefined ? options.limits.minItems : schema.minItems
+      const maxItems = schema.maxItems === undefined ? options.getConstrainedItems() : schema.maxItems
       let num = getRandomInt(minItems, maxItems)
       if (schema.items) {
         const sub = <JSONSchema6>schema.items
         while (num--) {
-          target.push(subGenerate(sub, queue))
+          target.push(subGenerate(sub, options))
         }
       } else {
         while (num--) {
@@ -119,40 +115,40 @@ export const TypeGenerators: {
     }
     return target
   },
-  boolean() {
+  boolean(schema: JSONSchema6, options: OptionType) {
     return Math.random() > 0.5
   },
-  integer(schema: JSONSchema6) {
-    const min = schema.minimum === undefined ? MIN_INTEGER : schema.minimum
-    const max = schema.maximum === undefined ? MAX_INTEGER : schema.maximum
+  integer(schema: JSONSchema6, options: OptionType) {
+    const min = schema.minimum === undefined ? options.limits.minInteger : schema.minimum
+    const max = schema.maximum === undefined ? options.limits.maxInteger : schema.maximum
     return getRandomInt(min, max)
   },
   null() {
     return null
   },
-  number(schema: JSONSchema6) {
-    const min = schema.minimum === undefined ? MIN_NUMBER : schema.minimum
-    const max = schema.maximum === undefined ? MAX_NUMBER : schema.maximum
+  number(schema: JSONSchema6, options: OptionType) {
+    const min = schema.minimum === undefined ? options.limits.minNumber : schema.minimum
+    const max = schema.maximum === undefined ? options.limits.maxNumber : schema.maximum
     return getRandom(min, max)
   },
-  object(schema: JSONSchema6, queue: JSONSchema6WithTarget[]) {
+  object(schema: JSONSchema6, options: OptionType) {
     const target = <{ [key: string]: string }>((<JSONSchema6WithTarget>schema).target)
     if (schema.required !== undefined && schema.properties !== undefined) {
       for (const key of schema.required) {
         if (key in schema.properties) {
           const sub = schema.properties[key]
           if (typeof sub === 'object') {
-            target[key] = subGenerate(sub, queue)
+            target[key] = subGenerate(sub, options)
           }
         }
       }
     }
     return target
   },
-  string(schema: JSONSchema6) {
+  string(schema: JSONSchema6, options: OptionType) {
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-    const min = schema.minLength === undefined ? MIN_LENGTH : schema.minLength
-    const max = schema.maxLength === undefined ? MAX_LENGTH : schema.maxLength
+    const min = schema.minLength === undefined ? options.limits.minLength : schema.minLength
+    const max = schema.maxLength === undefined ? options.limits.maxLength : schema.maxLength
     const length = getRandomInt(min, max)
     let text = ''
     for (let i = 0; i < length; i++) {

@@ -7,7 +7,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Marklet",
+      "name": "JSONSchemaSimulator",
       "program": "${workspaceFolder}\\dist\\index.js",
       "preLaunchTask": "tsc:watch",
       "outFiles": [

@@ -23,7 +23,8 @@ deploy:
     on:
       repo: jjyyxx/JSONSchemaSimulator
       branch: master
-  - provider: script
+  - skip_cleanup: true
+    provider: script
     script: node ./bin/auto_release.js
     on:
       repo: jjyyxx/JSONSchemaSimulator

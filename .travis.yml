@@ -2,7 +2,7 @@ language: node_js
 node_js:
 - node
 before_install:
-- ./bin/version_check.js
+- node ./bin/version_check.js
 install:
 - npm i
 - npm i -g codecov
